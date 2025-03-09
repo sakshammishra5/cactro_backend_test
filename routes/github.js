@@ -4,10 +4,28 @@ const router = require('express').Router();
 router.get('/github', async (req, res) => {
     console.log("Fetching user data");
     try {
-        let response = await fetch('https://api.github.com/users/sakshammishra5')
+        let response = await fetch('https://api.github.com/users/sakshammishra5',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API v3 response
+                },
+            }
+        )
         let data = await response.json();
 
-        let repoResponse = await fetch('https://api.github.com/users/sakshammishra5/repos')
+        let repoResponse = await fetch('https://api.github.com/users/sakshammishra5/repos',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API v3 response
+                },
+            }
+        )
         let repoData = await repoResponse.json();
 
         data.repoData = repoData;
@@ -23,7 +41,16 @@ router.get('/github/:repoName', async (req, res) => {
     console.log("request received");
     const { repoName } = req.params;
     try {
-        const response = await fetch(`https://api.github.com/repos/sakshammishra5/${repoName}`);
+        const response = await fetch(`https://api.github.com/repos/sakshammishra5/${repoName}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API v3 response
+                },
+            }
+        );
         const data = await response.json();
         res.send(data);
     }
@@ -75,7 +102,7 @@ router.post("/github/issues", async (req, res) => {
         console.log("GitHub API response:", data);
 
         // Return the issue URL
-        res.status(201).json({ issue_url: data.html_url,data });
+        res.status(201).json({ issue_url: data.html_url, data });
     } catch (error) {
         console.error("Error creating issue:", error.message);
         res.status(500).json({ error: `Failed to create issue: ${error.message}` });
